@@ -4,7 +4,22 @@
 
     <div v-if="isAuthenticated">
       <p>Vous êtes connecté en tant que {{ user?.username }}.</p>
+      <p>Vous êtes level {{ user?.level }}</p>
+      <p v-if="user?.isAdmin">Vous êtes admin</p>
       <button @click="logout">Déconnexion</button>
+
+      <!-- Bouton pour récupérer la liste des utilisateurs -->
+      <button @click="fetchAllUsers">Voir tous les utilisateurs</button>
+
+      <!-- Affichage des utilisateurs récupérés -->
+      <div v-if="users.length">
+        <h3>Liste des utilisateurs :</h3>
+        <ul>
+          <li v-for="user in users" :key="user.id">
+            {{ user.username }} - Niveau {{ user.level }}
+          </li>
+        </ul>
+      </div>
     </div>
 
     <form v-else @submit.prevent="login">
@@ -31,6 +46,7 @@ const password = ref('')
 const errorMessage = ref('')
 const isAuthenticated = ref(false)
 const user = ref(null)
+const users = ref([]) // Nouvelle propriété pour stocker la liste des utilisateurs
 
 // Fonction pour décoder le token
 function decodeToken(token) {
@@ -61,6 +77,24 @@ const fetchUserData = async () => {
   }
 }
 
+// Récupérer la liste de tous les utilisateurs
+const fetchAllUsers = async () => {
+  if (process.client) {
+    const token = localStorage.getItem('access_token')
+    if (token) {
+      try {
+        users.value = await $fetch('http://localhost:3000/users', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+      } catch (error) {
+        errorMessage.value = 'Impossible de récupérer la liste des utilisateurs.'
+      }
+    }
+  }
+}
+
 const login = async () => {
   try {
     const response = await $fetch('http://localhost:3000/auth/login', {
@@ -82,6 +116,7 @@ const logout = () => {
     localStorage.removeItem('access_token')
     isAuthenticated.value = false
     user.value = null
+    users.value = [] // Réinitialiser la liste des utilisateurs lors de la déconnexion
   }
 }
 
