@@ -5,4 +5,7 @@ export default defineNuxtConfig({
   devServer: {
     port: 8000, // Changez ici le port pour 8000
   },
+  css: [
+    '~/assets/css/reset.css'
+  ]
 })

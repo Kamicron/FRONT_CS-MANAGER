@@ -33,8 +33,10 @@
       </div>
       <button type="submit">Login</button>
     </form>
+    <get-user-id />
 
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+
   </div>
 </template>
 
