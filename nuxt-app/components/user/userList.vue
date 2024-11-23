@@ -1,8 +1,15 @@
 <template>
   <div class="user-list">
     <button @click="fetchAllUsers">Voir tous les utilisateurs</button>
-    <DynamicTable v-if="users.length" :columns="columns" :rows="rows" :rowsPerPage="10" @refresh="fetchAllUsers"
-      @clickRow="clickedRow" />
+    <DynamicTable
+    :columns="columns"
+    :rows="rows"
+    :initial-sort="initialSort"
+    :initial-filters="initialFilters"
+    @update:filters="handleFilters"
+    @update:sort="handleSort"
+    @clickRow="handleRowClick"
+  />
 
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
   </div>
@@ -65,6 +72,17 @@ const clickedRow = (id: string | number) => {
   console.log('Row clicked, ID:', id); // Vérifie si l'ID est bien affiché
 };
 
+
+const initialSort = { column: 'name', order: 'asc' };
+const initialFilters = { name: '' };
+
+const handleFilters = filters => {
+  console.log('Filtres mis à jour :', filters);
+};
+
+const handleSort = sort => {
+  console.log('Tri mis à jour :', sort);
+};
 </script>
 
 <style scoped lang="scss">

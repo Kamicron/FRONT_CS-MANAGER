@@ -1,6 +1,7 @@
 <template>
   <div class="layout">
     <h2>Application</h2>
+    <i class="fa-duotone fa-solid fa-image"></i>
     <login-form v-if="!authStore.isAuthenticated" @login-success="authStore.fetchUserData" />
     <user-profile v-else />
     <user-list v-if="authStore.isAuthenticated" />

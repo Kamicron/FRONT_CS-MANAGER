@@ -2,32 +2,28 @@
   <div class="table">
     <!-- Header -->
     <div class="table__header">
-      <div
-        v-for="column in columns"
-        :key="column.key"
-        class="table__header-cell"
-        :style="{ width: column.width || 'auto' }"
-      >
-        {{ column.title }}
+      <div v-for="column in columns" :key="column.key" class="table__header-cell"
+        :style="{ width: column.width || 'auto' }">
+        <!-- Titre et tri -->
+        <div class="table__header-title" @click="toggleSort(column.key)">
+          {{ column.title }}
+          <!-- <span v-if="sortColumn === column.key">
+            {{ sortOrder === 'asc' ? '▲' : '▼' }}
+          </span> -->
+          <i v-if="sortColumn === column.key"
+            :class="sortOrder === 'asc' ? 'fa-duotone fa-regular fa-chevron-up' : 'fa-duotone fa-regular fa-chevron-down'">
+          </i>
+        </div>
       </div>
     </div>
 
     <!-- Body -->
     <div class="table__body">
-      <div
-        v-for="row in paginatedRows"
-        :key="row.id"
-        class="table__row"
-        :style="{ backgroundColor: row.backgroundColor || '#fff' }"
-        @click="handleRowClick(row.id)"
-      >
-        <div
-          v-for="column in columns"
-          :key="column.key"
-          class="table__cell"
+      <div v-for="row in filteredAndSortedRows" :key="row.id" class="table__row"
+        :style="{ backgroundColor: row.backgroundColor || '#fff' }" @click="handleRowClick(row.id)">
+        <div v-for="column in columns" :key="column.key" class="table__cell"
           :style="{ color: row.cells[column.key]?.textColor || '#333', width: column.width || 'auto' }"
-          :title="row.cells[column.key]?.title"
-        >
+          :title="row.cells[column.key]?.title">
           {{ row.cells[column.key]?.display }}
         </div>
       </div>
@@ -42,27 +38,16 @@
 
       <!-- Pagination centrée -->
       <div class="table__pagination">
-        <button
-          class="table__pagination-button"
-          @click="goToPage(currentPage - 1)"
-          :disabled="currentPage === 1"
-        >
+        <button class="table__pagination-button" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">
           Précédent
         </button>
-        <button
-          v-for="item in paginationItems"
-          :key="item"
+        <button v-for="item in paginationItems" :key="item"
           :class="['table__pagination-button', { 'table__pagination-button--active': item === currentPage }]"
-          :disabled="item === '...'"
-          @click="typeof item === 'number' && goToPage(item)"
-        >
+          :disabled="item === '...'" @click="typeof item === 'number' && goToPage(item)">
           {{ item }}
         </button>
-        <button
-          class="table__pagination-button"
-          @click="goToPage(currentPage + 1)"
-          :disabled="currentPage === totalPages"
-        >
+        <button class="table__pagination-button" @click="goToPage(currentPage + 1)"
+          :disabled="currentPage === totalPages">
           Suivant
         </button>
       </div>
@@ -80,15 +65,8 @@
         </span>
         <span>
           Aller à la page :
-          <input
-            v-model="goToInputPage"
-            @keyup.enter="handleGoToPage"
-            type="number"
-            min="1"
-            :max="totalPages"
-            class="table__input"
-            placeholder="Page"
-          />
+          <input v-model="goToInputPage" @keyup.enter="handleGoToPage" type="number" min="1" :max="totalPages"
+            class="table__input" placeholder="Page" />
         </span>
         <button @click="emit('refresh')" class="table__refresh-button">Actualiser</button>
       </div>
@@ -98,12 +76,13 @@
 
 <script setup lang="ts">
 import { ref, computed, defineEmits } from 'vue';
-const emit = defineEmits(['refresh', 'clickRow']); 
+const emit = defineEmits(['refresh', 'clickRow']);
 
 interface TableColumn {
   key: string;
   title: string;
   width?: string;
+  sortable?: boolean; // Ajout : Détermine si la colonne est triable
 }
 
 interface TableRow {
@@ -195,6 +174,44 @@ const handleRowClick = (id: string | number) => {
   console.log('Row clicked in DynamicTable:', id);
   emit('clickRow', id); // Correction : emit the event correctly
 };
+
+// État pour le tri
+const sortColumn = ref<string | null>(null);
+const sortOrder = ref<'asc' | 'desc'>('asc');
+
+
+// Tri et filtres appliqués
+const filteredAndSortedRows = computed(() => {
+  let result = [...props.rows];
+
+
+  // Appliquer le tri
+  // Appliquer le tri
+  if (sortColumn.value) {
+    result.sort((a, b) => {
+      const valueA = (a.cells[sortColumn.value]?.display || '').toLowerCase().trim();
+      const valueB = (b.cells[sortColumn.value]?.display || '').toLowerCase().trim();
+      if (valueA < valueB) return sortOrder.value === 'asc' ? -1 : 1;
+      if (valueA > valueB) return sortOrder.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+
+  return result;
+});
+
+// Gestion du tri
+const toggleSort = (columnKey: string) => {
+  if (sortColumn.value === columnKey) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortColumn.value = columnKey;
+    sortOrder.value = 'asc';
+  }
+};
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -233,15 +250,17 @@ const handleRowClick = (id: string | number) => {
   &__row {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
+    padding: 8px 16px;
     border-radius: 12px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
 
     &:hover {
-      transform: scale(1.03); /* Effet de zoom */
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Ombre plus marquée */
+      transform: scale(1.03);
+      /* Effet de zoom */
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      /* Ombre plus marquée */
     }
   }
 
@@ -294,7 +313,8 @@ const handleRowClick = (id: string | number) => {
 
       &:hover:not(:disabled) {
         background: #6c63ff;
-        transform: translateY(-2px); /* Léger soulèvement */
+        transform: translateY(-2px);
+        /* Léger soulèvement */
       }
 
       &:disabled {
@@ -307,5 +327,4 @@ const handleRowClick = (id: string | number) => {
     }
   }
 }
-
 </style>
