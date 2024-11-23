@@ -4,7 +4,7 @@
     <button @click="fetchAllUsers">Voir tous les utilisateurs</button>
 
     <!-- Affichage des utilisateurs récupérés -->
-    <div v-if="users.length">
+    <div >
       <h3>Liste des utilisateurs :</h3>
       <ul>
         <li v-for="user in users" :key="user.id">
@@ -16,6 +16,8 @@
 </template>
 
 <script setup lang='ts'>
+
+const errorMessage = ref('')
 
 const user = ref(null)
 

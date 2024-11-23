@@ -1,137 +1,63 @@
 <template>
-  <div>
-    <h2>Login</h2>
+  <div class="layout">
+    <h2>Application</h2>
+    <login-form v-if="!authStore.isAuthenticated" @login-success="authStore.fetchUserData" />
+    <user-profile v-else />
+    <user-list v-if="authStore.isAuthenticated" />
+    <update-user-form v-if="authStore.isAuthenticated" :user-id="authStore.user?._id" />
 
-    <div v-if="isAuthenticated">
-      <p>Vous êtes connecté en tant que {{ user?.username }}.</p>
-      <p>Vous êtes level {{ user?.level }}</p>
-      <p v-if="user?.isAdmin">Vous êtes admin</p>
-      <button @click="logout">Déconnexion</button>
-
-      <!-- Bouton pour récupérer la liste des utilisateurs -->
-      <button @click="fetchAllUsers">Voir tous les utilisateurs</button>
-
-      <!-- Affichage des utilisateurs récupérés -->
-      <div v-if="users.length">
-        <h3>Liste des utilisateurs :</h3>
-        <ul>
-          <li v-for="user in users" :key="user.id">
-            {{ user.username }} - Niveau {{ user.level }}
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <form v-else @submit.prevent="login">
-      <div>
-        <label for="username">Username</label>
-        <input v-model="username" type="text" id="username" required />
-      </div>
-      <div>
-        <label for="password">Password</label>
-        <input v-model="password" type="password" id="password" required />
-      </div>
-      <button type="submit">Login</button>
-    </form>
-    <get-user-id />
-
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-
+    <DynamicTable class="table" :columns="columns" :rows="rows" />
   </div>
 </template>
 
+
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { useAuthStore } from '~/stores/useAuthStore'
 
-const username = ref('')
-const password = ref('')
-const errorMessage = ref('')
-const isAuthenticated = ref(false)
-const user = ref(null)
-const users = ref([]) // Nouvelle propriété pour stocker la liste des utilisateurs
+const authStore = useAuthStore()
 
-// Fonction pour décoder le token
-function decodeToken(token) {
-  const base64Url = token.split('.')[1]
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-  const jsonPayload = decodeURIComponent(
-    atob(base64)
-      .split('')
-      .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-      .join('')
-  )
-  return JSON.parse(jsonPayload)
-}
-
-// Récupérer les informations de l'utilisateur si connecté
-const fetchUserData = async () => {
-  if (process.client) {
-    const token = localStorage.getItem('access_token')
-    if (token) {
-      const userId = decodeToken(token).sub
-      user.value = await $fetch(`http://localhost:3000/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      isAuthenticated.value = true
-    }
+// Vérifier si l'utilisateur est connecté au chargement
+if (process.client) {
+  const token = localStorage.getItem('access_token')
+  if (token) {
+    authStore.fetchUserData() // Récupère les données utilisateur si un token est présent
   }
 }
 
-// Récupérer la liste de tous les utilisateurs
-const fetchAllUsers = async () => {
-  if (process.client) {
-    const token = localStorage.getItem('access_token')
-    if (token) {
-      try {
-        users.value = await $fetch('http://localhost:3000/users', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-      } catch (error) {
-        errorMessage.value = 'Impossible de récupérer la liste des utilisateurs.'
-      }
-    }
-  }
-}
+const columns = [
+  { key: 'name', title: 'Nom', width: '30%' },
+  { key: 'age', title: 'Âge', width: '20%' },
+  { key: 'job', title: 'Profession', width: '50%' },
+];
 
-const login = async () => {
-  try {
-    const response = await $fetch('http://localhost:3000/auth/login', {
-      method: 'POST',
-      body: { username: username.value, password: password.value },
-    })
-
-    if (response.access_token && process.client) {
-      localStorage.setItem('access_token', response.access_token)
-      await fetchUserData() // Charger les données utilisateur
-    }
-  } catch (error) {
-    errorMessage.value = 'Erreur de login. Veuillez vérifier vos identifiants.'
-  }
-}
-
-const logout = () => {
-  if (process.client) {
-    localStorage.removeItem('access_token')
-    isAuthenticated.value = false
-    user.value = null
-    users.value = [] // Réinitialiser la liste des utilisateurs lors de la déconnexion
-  }
-}
-
-// Initialisation côté client pour éviter l’erreur de rendu côté serveur
-onMounted(() => {
-  if (process.client && localStorage.getItem('access_token')) {
-    fetchUserData()
-  }
-})
+const rows = [
+  {
+    id: 1,
+    backgroundColor: '#f9f9f9', // Couleur de fond de la ligne
+    cells: {
+      name: { display: 'Alice', title: 'Nom complet: Alice Dupont', textColor: '#ff5733' },
+      age: { display: '25', title: 'Âge en années', textColor: '#33c1ff' },
+      job: { display: 'Développeuse', title: 'Profession actuelle', textColor: '#75ff33' },
+    },
+  },
+  {
+    id: 2,
+    backgroundColor: '#FFe9e9',
+    cells: {
+      name: { display: 'Bob', title: 'Nom complet: Bob Martin', textColor: '#6a33ff' },
+      age: { display: '30', title: 'Âge en années', textColor: '#ff33a8' },
+      job: { display: 'Designer', title: 'Profession actuelle', textColor: '#ffbd33' },
+    },
+  },
+];
 </script>
 
-<style scoped>
-.error {
-  color: red;
+<style lang="scss" scoped>
+.layout {
+  padding: 50px;
+}
+
+.table {
+  margin: 20px 0;
 }
 </style>
