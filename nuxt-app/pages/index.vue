@@ -6,7 +6,7 @@
     <user-list v-if="authStore.isAuthenticated" />
     <update-user-form v-if="authStore.isAuthenticated" :user-id="authStore.user?._id" />
 
-    <DynamicTable class="table" :columns="columns" :rows="rows" />
+    <!-- <DynamicTable :columns="columns" :rows="rows" :rowsPerPage="15" />-->
   </div>
 </template>
 
@@ -30,26 +30,16 @@ const columns = [
   { key: 'job', title: 'Profession', width: '50%' },
 ];
 
-const rows = [
-  {
-    id: 1,
-    backgroundColor: '#f9f9f9', // Couleur de fond de la ligne
-    cells: {
-      name: { display: 'Alice', title: 'Nom complet: Alice Dupont', textColor: '#ff5733' },
-      age: { display: '25', title: 'Âge en années', textColor: '#33c1ff' },
-      job: { display: 'Développeuse', title: 'Profession actuelle', textColor: '#75ff33' },
-    },
+const rows = Array.from({ length: 250 }, (v, i) => ({
+  id: i + 1,
+  backgroundColor: i % 2 === 0 ? '#fff' : '#f7f7f7',
+  cells: {
+    name: { display: `Utilisateur ${i + 1}`, title: `Nom complet: Utilisateur ${i + 1}`, textColor: '#1e90ff' },
+    age: { display: `${20 + (i % 30)}`, title: 'Âge en années', textColor: '#10b981' },
+    job: { display: `Profession ${i + 1}`, title: `Profession de l'utilisateur ${i + 1}`, textColor: '#e63946' },
   },
-  {
-    id: 2,
-    backgroundColor: '#FFe9e9',
-    cells: {
-      name: { display: 'Bob', title: 'Nom complet: Bob Martin', textColor: '#6a33ff' },
-      age: { display: '30', title: 'Âge en années', textColor: '#ff33a8' },
-      job: { display: 'Designer', title: 'Profession actuelle', textColor: '#ffbd33' },
-    },
-  },
-];
+}));
+
 </script>
 
 <style lang="scss" scoped>
