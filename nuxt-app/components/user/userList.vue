@@ -1,22 +1,15 @@
 <template>
   <div class="user-list">
-    <button @click="fetchAllUsers">Voir tous les utilisateurs</button>
-    <DynamicTable
-    :columns="columns"
-    :rows="rows"
-    :initial-sort="initialSort"
-    :initial-filters="initialFilters"
-    @update:filters="handleFilters"
-    @update:sort="handleSort"
-    @clickRow="handleRowClick"
-  />
+    <div v-if="users.length">
+      <DynamicTable :columns="columns" :rows="rows" :rowsPerPage="10" @refresh="fetchAllUsers" @clickRow="clickedRow" />
+    </div>
 
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const users = ref([])
 const errorMessage = ref('')
@@ -51,7 +44,6 @@ const rows = computed(() =>
   }))
 )
 
-
 const fetchAllUsers = async () => {
   const token = localStorage.getItem('access_token')
   if (token) {
@@ -59,7 +51,7 @@ const fetchAllUsers = async () => {
       users.value = await $fetch('http://localhost:3000/users', {
         headers: { Authorization: `Bearer ${token}` },
       })
-      console.log('users', users);
+      console.log('users', users)
 
       errorMessage.value = ''
     } catch (error) {
@@ -68,21 +60,14 @@ const fetchAllUsers = async () => {
   }
 }
 
+// Appelle fetchAllUsers lors du montage du composant
+onMounted(() => {
+  fetchAllUsers()
+})
+
 const clickedRow = (id: string | number) => {
-  console.log('Row clicked, ID:', id); // Vérifie si l'ID est bien affiché
-};
-
-
-const initialSort = { column: 'name', order: 'asc' };
-const initialFilters = { name: '' };
-
-const handleFilters = filters => {
-  console.log('Filtres mis à jour :', filters);
-};
-
-const handleSort = sort => {
-  console.log('Tri mis à jour :', sort);
-};
+  console.log('Row clicked, ID:', id) // Affiche l'ID de la ligne cliquée
+}
 </script>
 
 <style scoped lang="scss">

@@ -1,0 +1,30 @@
+@use './_variables.scss' as *;
+
+// Mixin pour la typographie
+@mixin text-style($font-size, $font-weight, $line-height, $letter-spacing: 0) {
+  font-family: $font-family;
+  font-size: $font-size;
+  font-weight: $font-weight;
+  line-height: $line-height;
+  letter-spacing: $letter-spacing;
+}
+
+// Mixin pour les boutons
+@mixin button-style($bg-color, $text-color, $hover-color) {
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: $hover-color;
+  }
+}
+
+// Mixin pour les ombres
+@mixin box-shadow($color: $color-shadow, $blur: 10px, $spread: 0) {
+  box-shadow: 0 4px $blur $spread $color;
+}

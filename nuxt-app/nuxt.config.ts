@@ -10,6 +10,10 @@ export default defineNuxtConfig({
       ],
     },
   },
+  routeRules: {
+    // Applique le middleware à toutes les routes
+    '/**': { ssr: false },
+  },
   components: { 
     global: true, // Charge tous les composants sans les préfixer avec le nom des dossiers
     dirs: [{ path: '~/components/', pathPrefix: false },],
@@ -21,7 +25,27 @@ export default defineNuxtConfig({
   },
   css: [
     '~/assets/css/reset.css', // Fichier CSS de réinitialisation local
-    '@fortawesome/fontawesome-svg-core/styles.css', // Styles Core de FontAwesome
+    '@fortawesome/fontawesome-svg-core/styles.css',
+    '@/assets/scss/style.scss' // Styles Core de FontAwesome
   ],
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `
+            @use "@/assets/scss/_variables.scss" as *;
+            @use "@/assets/scss/_mixins.scss" as *;
+          `,
+        },
+      },
+    },
+  },
   plugins: ['~/plugins/fontawesome.js'],
+  modules: ['@pinia/nuxt'],
+  // pinia: {
+  //   autoImports: [
+  //     // Auto-import `defineStore` depuis Pinia
+  //     'defineStore',
+  //   ],
+  // },
 })

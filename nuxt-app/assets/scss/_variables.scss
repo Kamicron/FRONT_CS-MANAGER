@@ -1,0 +1,38 @@
+// Couleurs principales
+$color-dark: #02020e;
+$color-primary: #1E1E2F;
+$color-secondary: #27293D;
+$color-text-main: #E5E5E5;
+$color-text-secondary: #B0B3C5;
+$color-accent: #FF9800;
+$color-accent-hover: #FFB347;
+$color-error: #FF5252;
+$color-error-hover: #b62525;
+$color-success: #4CAF50;
+$color-shadow: rgba(0, 0, 0, 0.6);
+
+// Typographie
+$font-family: 'Rajdhani', sans-serif;
+$font-size-base: 16px;
+$font-size-small: 14px;
+$font-size-large: 18px;
+$font-weight-normal: 400;
+$font-weight-semi-bold: 600;
+$font-weight-bold: 700;
+
+// Espacements
+$line-height-base: 1.5;
+$line-height-tight: 1.2;
+$letter-spacing-title: 0.5px;
+
+// Breakpoints
+$breakpoint-mobile: 576px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1200px;
+
+
+//spacing
+$spacing-xs: 5px;
+$spacing-s: 10px;
+$spacing-m: 20px;
+$spacing-xl: 50px

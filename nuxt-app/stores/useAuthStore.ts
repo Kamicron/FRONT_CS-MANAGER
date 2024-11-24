@@ -3,20 +3,47 @@ import { ref } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
+  const isAdmin = ref(false)
   const user = ref(null)
 
   const fetchUserData = async () => {
-    const token = localStorage.getItem('access_token')
+    // if (process.client) { // Vérifie si on est côté client
+    //   const token = localStorage.getItem('access_token')
+    //   if (token) {
+    //     try {
+    //       const decoded = JSON.parse(atob(token.split('.')[1]))
+
+    //       console.log('decoded', decoded);
+          
+    //       user.value = await $fetch(`http://localhost:3000/users/${decoded.sub}`, {
+    //         headers: { Authorization: `Bearer ${token}` },
+    //       })
+  
+    //       isAdmin.value = user.value.isAdmin // Vérifie si l'utilisateur est admin
+    //       isAuthenticated.value = true
+    //     } catch (error) {
+    //       console.error('Erreur lors de la récupération des données utilisateur :', error)
+    //       logout() // Nettoie en cas d'erreur
+    //     }
+    //   }
+    // }
+  }
+  
+  const initializeFromToken = () => {
+    const token = process.client ? localStorage.getItem('access_token') : null
+    console.log('token', token);
+    
     if (token) {
       try {
-        const decoded = JSON.parse(atob(token.split('.')[1]))
-        user.value = await $fetch(`http://localhost:3000/users/${decoded.sub}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        const decoded = JSON.parse(atob(token.split('.')[1])) // Décodage du payload du JWT
         isAuthenticated.value = true
+        console.log('isAuthentificated.value', isAuthenticated.value);
+        
+        isAdmin.value = decoded.isAdmin || false // Récupère l'information "isAdmin"
+        user.value = { username: decoded.username, level: decoded.level } // Stocke d'autres données utiles
       } catch (error) {
-        console.error('Erreur lors de la récupération des données utilisateur :', error)
-        logout() // Nettoie en cas d'erreur
+        console.error('Erreur lors du décodage du token :', error)
+        logout()
       }
     }
   }
@@ -36,16 +63,36 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const serverInitialize = async () => {
+    if (process.server) {
+      const token = useRequestHeaders()['cookie']?.split('access_token=')[1]
+      if (token) {
+        try {
+          const decoded = JSON.parse(atob(token.split('.')[1]))
+          isAuthenticated.value = true
+          isAdmin.value = decoded.isAdmin || false
+          user.value = { username: decoded.username, level: decoded.level }
+        } catch (error) {
+          console.error('Erreur lors de l\'initialisation côté serveur:', error)
+        }
+      }
+    }
+  }
+
   const logout = () => {
     localStorage.removeItem('access_token')
     isAuthenticated.value = false
+    isAdmin.value = false
     user.value = null
   }
 
   return {
     isAuthenticated,
+    isAdmin,
     user,
     fetchUserData,
+    serverInitialize,
+    initializeFromToken,
     login,
     logout,
   }

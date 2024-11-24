@@ -1,0 +1,24 @@
+@use './_variables.scss' as *;
+@use './_mixins.scss' as *;
+
+body {
+  background-color: $color-primary;
+  color: $color-text-main;
+  @include text-style($font-size-base, $font-weight-normal, $line-height-base);
+}
+
+h1, h2, h3 {
+  @include text-style($font-size-large, $font-weight-semi-bold, $line-height-tight, $letter-spacing-title);
+  color: $color-text-main;
+}
+
+button {
+  @include button-style($color-accent, $color-primary, $color-accent-hover);
+}
+
+.card {
+  background-color: $color-secondary;
+  border-radius: 8px;
+  padding: 1rem;
+  @include box-shadow();
+}
