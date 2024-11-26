@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
   const isAdmin = ref(false)
-  const user = ref(null)
+  const user = ref<IUser | null>()
 
   const fetchUserData = async () => {
     // if (process.client) { // Vérifie si on est côté client
@@ -40,7 +39,8 @@ export const useAuthStore = defineStore('auth', () => {
         console.log('isAuthentificated.value', isAuthenticated.value);
         
         isAdmin.value = decoded.isAdmin || false // Récupère l'information "isAdmin"
-        user.value = { username: decoded.username, level: decoded.level } // Stocke d'autres données utiles
+        console.log('decoded', decoded)
+        user.value = { username: decoded.username, level: decoded.level, _id:decoded.sub } // Stocke d'autres données utiles
       } catch (error) {
         console.error('Erreur lors du décodage du token :', error)
         logout()

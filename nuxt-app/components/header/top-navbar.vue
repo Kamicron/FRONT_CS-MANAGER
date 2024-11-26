@@ -2,10 +2,8 @@
   <nav class="navbar">
     <ul class="nav-list">
       <li><a href="/">Accueil</a></li>
-      <li><a href="#">Compétitions</a></li>
       <li><a href="#">Équipes</a></li>
-
-      <!-- Ajoute une vérification pour éviter les erreurs -->
+      <li v-if="authStore && authStore.isAuthenticated"><a href="/profil">Profil</a></li>
       <li v-if="authStore && authStore.isAdmin"><a href="/admin/utilisateurs">Admin/user</a></li>
       <li v-if="authStore && !authStore.isAuthenticated">
         <button @click="isOpen=true"><i class="fa-duotone fa-solid fa-user"></i></button>
@@ -28,7 +26,6 @@ const isOpen = ref(false)
 <style lang='scss' scoped>
 .navbar {
   width: 100%;
-  /* background-color: #222; */
   padding: 0.5rem 1rem;
   display: flex;
   justify-content: center;

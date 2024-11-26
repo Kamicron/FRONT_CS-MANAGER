@@ -3,7 +3,6 @@
     <input type="text" v-model="id" placeholder="Entrez l'ID du joueur" />
     <button @click="fetchUserData(id)">Voir le joueur</button>
 
-    <!-- Affichage des informations de l'utilisateur si elles existent -->
     <div v-if="user" class="user-details">
       <h3>Détails du joueur :</h3>
       <p><strong>Nom d'utilisateur :</strong> {{ user.username }}</p>
@@ -16,21 +15,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 
-// Variables pour l'ID utilisateur, les données de l'utilisateur et les messages d'erreur
 const id = ref('')
-const user = ref(null)
+const user = ref<IUser  | null>(null)
 const errorMessage = ref('')
 
-const fetchUserData = async (userId) => {
-  errorMessage.value = '' // Réinitialiser le message d'erreur
-
-  // Vérifier si un token est présent
+const fetchUserData = async (userId: IUser) => {
+  errorMessage.value = '' 
   const token = localStorage.getItem('access_token')
   if (token) {
     try {
-      // Faire l'appel API pour récupérer les détails du joueur
       user.value = await $fetch(`http://localhost:3000/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -38,7 +32,7 @@ const fetchUserData = async (userId) => {
       })
     } catch (error) {
       errorMessage.value = 'Erreur lors de la récupération du joueur. Vérifiez l’ID et essayez encore.'
-      user.value = null // Réinitialiser l'utilisateur si une erreur se produit
+      user.value = null 
     }
   } else {
     errorMessage.value = "Vous n'êtes pas authentifié. Connectez-vous pour continuer."

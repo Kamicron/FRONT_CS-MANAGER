@@ -11,12 +11,10 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 const isModalOpen = ref(props.modelValue);
 
-// Synchroniser avec modelValue
 watch(() => props.modelValue, (newVal) => {
   isModalOpen.value = newVal;
 }, { immediate: true });
 
-// Mettre à jour le parent via v-model
 watch(isModalOpen, (newVal) => {
   emit('update:modelValue', newVal);
 });

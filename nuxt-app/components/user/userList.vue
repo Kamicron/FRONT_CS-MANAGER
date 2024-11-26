@@ -9,7 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
 
 const users = ref([])
 const errorMessage = ref('')
@@ -25,10 +24,10 @@ const rows = computed(() =>
   users.value.map((user) => ({
     id: user._id,
     backgroundColor: user.isAdmin
-      ? '#e3f2fd' // Bleu pâle
+      ? '#e3f2fd'
       : user.deleted_at
-        ? '#fdecea' // Rouge pâle
-        : '#e8f5e9', // Vert pâle
+        ? '#fdecea' 
+        : '#e8f5e9', 
     cells: {
       username: { display: user.username, title: 'Nom utilisateur' },
       level: { display: user.level.toString(), title: 'Niveau de l’utilisateur' },
@@ -60,13 +59,12 @@ const fetchAllUsers = async () => {
   }
 }
 
-// Appelle fetchAllUsers lors du montage du composant
 onMounted(() => {
   fetchAllUsers()
 })
 
 const clickedRow = (id: string | number) => {
-  console.log('Row clicked, ID:', id) // Affiche l'ID de la ligne cliquée
+  console.log('Row clicked, ID:', id) 
 }
 </script>
 

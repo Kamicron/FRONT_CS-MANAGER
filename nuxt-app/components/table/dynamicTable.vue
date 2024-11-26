@@ -1,15 +1,11 @@
 <template>
   <div class="table">
-    <!-- Header -->
     <div class="table__header">
       <div v-for="column in columns" :key="column.key" class="table__header-cell"
         :style="{ width: column.width || 'auto' }">
-        <!-- Titre et tri -->
         <div class="table__header-title" @click="toggleSort(column.key)">
           {{ column.title }}
-          <!-- <span v-if="sortColumn === column.key">
-            {{ sortOrder === 'asc' ? '▲' : '▼' }}
-          </span> -->
+
           <i v-if="sortColumn === column.key"
             :class="sortOrder === 'asc' ? 'fa-duotone fa-regular fa-chevron-up' : 'fa-duotone fa-regular fa-chevron-down'">
           </i>
@@ -17,7 +13,6 @@
       </div>
     </div>
 
-    <!-- Body -->
     <div class="table__body">
       <div v-for="row in filteredAndSortedRows" :key="row.id" class="table__row"
         :style="{ backgroundColor: row.backgroundColor || '#fff' }" @click="handleRowClick(row.id)">
@@ -29,14 +24,11 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="table__footer">
-      <!-- Total éléments à gauche -->
       <div class="table__footer-elements">
         Total : {{ totalRows }} éléments
       </div>
 
-      <!-- Pagination centrée -->
       <div class="table__pagination">
         <button class="table__pagination-button" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">
           Précédent
@@ -52,7 +44,6 @@
         </button>
       </div>
 
-      <!-- Paramétrage à droite -->
       <div class="table__footer-settings">
         <span>
           Afficher :
@@ -81,7 +72,7 @@ interface TableColumn {
   key: string;
   title: string;
   width?: string;
-  sortable?: boolean; // Ajout : Détermine si la colonne est triable
+  sortable?: boolean; 
 }
 
 interface TableRow {
@@ -119,34 +110,29 @@ const updateRowsPerPage = (value: number) => {
   currentPage.value = 1;
 };
 
-const goToInputPage = ref(''); // Valeur pour aller à une page donnée
+const goToInputPage = ref(''); 
 const handleGoToPage = () => {
   const page = parseInt(goToInputPage.value, 10);
   if (!isNaN(page)) goToPage(page);
   goToInputPage.value = '';
 };
 
-// Pagination intelligente
 const paginationItems = computed(() => {
   const items = [];
 
   if (totalPages.value <= 5) {
-    // Si peu de pages, tout afficher
     for (let i = 1; i <= totalPages.value; i++) {
       items.push(i);
     }
   } else {
-    // Ajouter la première page si elle n'est pas déjà incluse
     if (currentPage.value !== 1) {
       items.push(1);
     }
 
-    // Ajouter '...' après la première page si nécessaire
     if (currentPage.value > 3) {
       items.push('...');
     }
 
-    // Ajouter les pages avant, courante et après
     if (currentPage.value > 2) {
       items.push(currentPage.value - 1);
     }
@@ -155,12 +141,10 @@ const paginationItems = computed(() => {
       items.push(currentPage.value + 1);
     }
 
-    // Ajouter '...' avant la dernière page si nécessaire
     if (currentPage.value < totalPages.value - 2) {
       items.push('...');
     }
 
-    // Ajouter la dernière page si elle n'est pas déjà incluse
     if (currentPage.value !== totalPages.value) {
       items.push(totalPages.value);
     }
@@ -171,21 +155,16 @@ const paginationItems = computed(() => {
 
 const handleRowClick = (id: string | number) => {
   console.log('Row clicked in DynamicTable:', id);
-  emit('clickRow', id); // Correction : emit the event correctly
+  emit('clickRow', id);
 };
 
-// État pour le tri
 const sortColumn = ref<string | null>(null);
 const sortOrder = ref<'asc' | 'desc'>('asc');
 
-
-// Tri et filtres appliqués
 const filteredAndSortedRows = computed(() => {
   let result = [...props.rows];
 
 
-  // Appliquer le tri
-  // Appliquer le tri
   if (sortColumn.value) {
     result.sort((a, b) => {
       const valueA = (a.cells[sortColumn.value]?.display || '').toLowerCase().trim();
@@ -200,7 +179,7 @@ const filteredAndSortedRows = computed(() => {
   return result;
 });
 
-// Gestion du tri
+
 const toggleSort = (columnKey: string) => {
   if (sortColumn.value === columnKey) {
     sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
@@ -209,7 +188,6 @@ const toggleSort = (columnKey: string) => {
     sortOrder.value = 'asc';
   }
 };
-
 
 </script>
 
@@ -257,9 +235,7 @@ const toggleSort = (columnKey: string) => {
 
     &:hover {
       transform: scale(1.03);
-      /* Effet de zoom */
       box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-      /* Ombre plus marquée */
     }
   }
 
@@ -313,7 +289,6 @@ const toggleSort = (columnKey: string) => {
       &:hover:not(:disabled) {
         background: #6c63ff;
         transform: translateY(-2px);
-        /* Léger soulèvement */
       }
 
       &:disabled {

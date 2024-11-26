@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     await authStore.initializeFromToken()
   }
 
-  if (!authStore.isAdmin) {
+  if (!authStore.isAuthenticated) {
     return navigateTo('/') 
   }
 })
