@@ -7,8 +7,8 @@ declare global {
     password: string
     level: number
     isAdmin: Boolean
-    created_at: Date
-    last_login: Date
-    deleted_at?: Date
+    dates: IloginDate
+
   }
 }
+

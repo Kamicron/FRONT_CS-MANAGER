@@ -21,22 +21,22 @@ const columns = [
 ]
 
 const rows = computed(() =>
-  users.value.map((user) => ({
+  users.value.map((user: IUser) => ({
     id: user._id,
     backgroundColor: user.isAdmin
       ? '#e3f2fd'
-      : user.deleted_at
+      : user.dates.deleted_at
         ? '#fdecea' 
         : '#e8f5e9', 
     cells: {
       username: { display: user.username, title: 'Nom utilisateur' },
       level: { display: user.level.toString(), title: 'Niveau de l’utilisateur' },
       created_at: {
-        display: user.created_at ? new Date(user.created_at).toLocaleString() : 'Inconnue',
+        display: user.dates.created_at ? new Date(user.dates.created_at).toLocaleString() : 'Inconnue',
         title: 'Date de création',
       },
       last_login: {
-        display: user.last_login ? new Date(user.last_login).toLocaleString() : 'Jamais connecté',
+        display: user.dates.last_login ? new Date(user.dates.last_login).toLocaleString() : 'Jamais connecté',
         title: 'Dernière connexion',
       },
     },
